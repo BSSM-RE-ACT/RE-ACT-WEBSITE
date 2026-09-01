@@ -48,6 +48,13 @@ services:
     ports:
       - "20260:80"
 
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - frontend
+
 volumes:
   db_data:
   uploads_data:

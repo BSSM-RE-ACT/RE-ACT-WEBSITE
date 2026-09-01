@@ -17,39 +17,23 @@ cp .env.example .env   # 값 채우기 (아래 참고)
 docker compose up -d --build
 ```
 
-세 컨테이너가 뜨고, 각각 호스트 포트로 열려요:
+네 컨테이너가 뜨고, 각각 호스트 포트로 열려요:
 
 | 컨테이너 | 호스트 포트 | 내용 |
 |---|---|---|
 | `frontend` | **20260** | nginx가 정적 사이트를 서빙하고 `/api`, `/uploads`는 backend로 프록시함 (같은 오리진) |
 | `backend` | **20261** | FastAPI 직접 접근용 (디버깅/헬스체크) |
 | `db` | **20262** | MySQL 8 |
-
-**react.bssm.dev는 20260 포트를 가리키면 돼요.** 프론트 컨테이너 하나가 정적 파일 + API 프록시를
-다 처리하니까, 앞단 리버스 프록시(nginx/Caddy/Traefik 등)는 `react.bssm.dev → localhost:20260` 로만
-연결하고 TLS만 붙여주면 끝이에요. 예를 들어 서버에 nginx가 이미 있다면:
-
-```nginx
-server {
-    server_name react.bssm.dev;
-    location / {
-        proxy_pass http://127.0.0.1:20260;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
-(그 다음 `certbot --nginx -d react.bssm.dev`로 인증서 붙이면 됩니다.)
+| `cloudflared` | (없음, 아웃바운드 전용) | react.bssm.dev ↔ frontend를 연결하는 Cloudflare Tunnel |
 
 `.env`에 채워야 하는 값 (`.env.example` 참고):
 
 - `SECRET_KEY` — JWT 서명 키, 랜덤 문자열로 (예: `openssl rand -hex 32`)
 - `ADMIN_USERNAME` / `ADMIN_PASSWORD` — root 계정
-- `ALLOWED_ORIGINS` — 기본값 `https://react.bssm.dev`로 되어 있음 (같은 오리진 프록시라 사실 안 써도 되지만 안전망으로 유지)
+- `ALLOWED_ORIGINS` — 기본값 `https://react.bssm.dev`로 되어 있음
 - `GOOGLE_CLIENT_ID` / `VITE_GOOGLE_CLIENT_ID` — 구글 로그인 쓸 거면 (아래 "구글 로그인 켜는 방법" 참고, JS origin에 `https://react.bssm.dev` 추가)
 - `MYSQL_ROOT_PASSWORD`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE` — DB 계정/비밀번호
+- `CLOUDFLARE_TUNNEL_TOKEN` — 아래 "Cloudflare Tunnel로 도메인 연결하기" 참고
 
 ⚠️ **20262(MySQL) 포트는 외부에 그대로 노출돼요.** 서버 방화벽에서 20262는 필요한 IP만 열거나
 아예 막아두는 걸 추천해요 (백엔드는 도커 내부망으로 `db:3306`에 붙기 때문에 굳이 호스트에 안 열어도
@@ -57,6 +41,34 @@ server {
 
 콘텐츠/업로드 이미지는 `db_data`, `uploads_data` 도커 볼륨에 저장돼서 컨테이너를 내렸다 올려도 유지돼요.
 코드를 바꾼 뒤엔 `docker compose up -d --build`로 다시 빌드/재기동하면 됩니다.
+
+### Cloudflare Tunnel로 도메인 연결하기
+
+서버 방화벽에 인바운드 포트를 열 필요 없이, `cloudflared` 컨테이너가 Cloudflare로 아웃바운드
+연결만 맺어서 `react.bssm.dev` 요청을 `frontend` 컨테이너로 그대로 전달해요. TLS 인증서도
+Cloudflare가 알아서 처리합니다. (bssm.dev 도메인이 이미 Cloudflare에 등록되어 있어야 해요 — 학교
+인프라 관리자에게 Zero Trust 대시보드 접근 권한이 있는지 확인하세요.)
+
+1. [Cloudflare Zero Trust 대시보드](https://one.dash.cloudflare.com/) → **Networks → Tunnels →
+   Create a tunnel**
+2. Connector 타입은 **Cloudflared** 선택, 터널 이름 입력 (예: `react-club`)
+3. "Install and run a connector" 화면에서 Docker 탭을 보면 `cloudflared tunnel run --token
+   eyJ...` 같은 명령어가 나와요. 그 `--token` 뒤의 긴 문자열만 복사해서 `.env`의
+   `CLOUDFLARE_TUNNEL_TOKEN=`에 붙여넣으세요.
+4. 같은 화면에서 **Public Hostname** 탭 → Add a public hostname
+   - Subdomain: `react`, Domain: `bssm.dev` (합쳐서 `react.bssm.dev`)
+   - Service Type: **HTTP**, URL: **`frontend:80`** (도커 서비스 이름 — `localhost`나 `20260`이
+     아니라 `frontend:80`으로 적어야 해요. `cloudflared`가 같은 도커 네트워크 안에서 `frontend`
+     컨테이너로 직접 붙기 때문이에요.)
+5. `docker compose up -d --build` (또는 이미 떠 있다면 `docker compose up -d cloudflared`)
+
+몇 초 안에 `https://react.bssm.dev`가 열려요. 터널이 안 붙으면 `docker compose logs cloudflared`로
+확인하세요 — 대부분 토큰이 잘못 복사됐거나 아직 `.env`에 안 채워진 경우예요.
+
+> Cloudflare Tunnel을 안 쓰고 싶다면 서버에 이미 있는 리버스 프록시(nginx/Caddy 등)로
+> `react.bssm.dev → localhost:20260`을 연결하고 certbot 같은 걸로 인증서를 붙여도 돼요. 그 경우
+> `docker-compose.yml`의 `cloudflared` 서비스는 지우거나 `CLOUDFLARE_TUNNEL_TOKEN`을 빈 채로 두면
+> (재시작을 반복하긴 하지만) 다른 서비스에는 영향 없어요.
 
 ## 로컬 개발 (Docker 없이)
 
