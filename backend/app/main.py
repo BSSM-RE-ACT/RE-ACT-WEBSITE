@@ -6,10 +6,12 @@ from fastapi.staticfiles import StaticFiles
 
 from .config import settings
 from .database import Base, SessionLocal, engine
+from .migrate import add_missing_columns
 from .routers import api_router
 from .seed import run_seed
 
 Base.metadata.create_all(bind=engine)
+add_missing_columns(engine, Base.metadata)
 os.makedirs(settings.upload_dir, exist_ok=True)
 
 with SessionLocal() as db:
