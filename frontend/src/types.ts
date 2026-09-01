@@ -34,10 +34,12 @@ export interface Project {
   id: number
   title: string
   description: string
+  content: string
   tags: string
   github_url: string
   live_url: string
   image_url: string
+  gallery: string[]
   is_featured: boolean
   order: number
 }

@@ -82,18 +82,22 @@ export function AdminDashboard() {
               emptyItem={{
                 title: '',
                 description: '',
+                content: '',
                 tags: '',
                 github_url: '',
                 live_url: '',
                 image_url: '',
+                gallery: [],
                 is_featured: false,
               }}
               renderLabel={(p) => p.title}
               fields={[
                 { key: 'title', label: '제목', type: 'text' },
-                { key: 'description', label: '설명', type: 'textarea' },
+                { key: 'description', label: '한 줄 설명 (목록에 보여요)', type: 'textarea' },
+                { key: 'content', label: '상세 내용 (상세 페이지에 보여요)', type: 'textarea' },
                 { key: 'tags', label: '기술 태그', type: 'text', placeholder: 'React, TypeScript, FastAPI' },
                 { key: 'image_url', label: '썸네일', type: 'image' },
+                { key: 'gallery', label: '상세 페이지 이미지 갤러리', type: 'gallery' },
                 { key: 'github_url', label: 'Github 링크', type: 'text' },
                 { key: 'live_url', label: 'Live 링크', type: 'text' },
                 { key: 'is_featured', label: 'Featured', type: 'checkbox' },

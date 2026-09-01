@@ -80,10 +80,12 @@ class Project(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(128), nullable=False)
     description = Column(Text, default="")
+    content = Column(Text, default="")
     tags = Column(String(255), default="")
     github_url = Column(String(255), default="")
     live_url = Column(String(255), default="")
     image_url = Column(String(255), default="")
+    gallery = Column(JSON, default=list)
     is_featured = Column(Boolean, default=False)
     order = Column(Integer, default=0)
 

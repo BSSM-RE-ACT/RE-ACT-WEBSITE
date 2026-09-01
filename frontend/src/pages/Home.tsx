@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { api } from '../lib/api'
 import { useApiData } from '../lib/useApiData'
 import type {
@@ -43,6 +44,7 @@ const DEFAULT_CONTENT: SiteContent = {
 }
 
 export function Home() {
+  const location = useLocation()
   const { data: content } = useApiData<SiteContent>('/site-content', DEFAULT_CONTENT)
   const { data: members } = useApiData<Member[]>('/members', [])
   const { data: projects } = useApiData<Project[]>('/projects', [])
@@ -56,6 +58,12 @@ export function Home() {
       sessionStorage.setItem('react_visit_logged', '1')
     }
   }, [])
+
+  useEffect(() => {
+    if (!location.hash) return
+    const el = document.querySelector(location.hash)
+    el?.scrollIntoView()
+  }, [location.hash, projects])
 
   return (
     <div className="min-h-screen bg-bg text-fg">

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { api } from '../lib/api'
-import { CheckboxField, ImageField, ListField, TextAreaField, TextField } from './fields'
+import { CheckboxField, GalleryField, ImageField, ListField, TextAreaField, TextField } from './fields'
 
-type FieldType = 'text' | 'textarea' | 'checkbox' | 'image' | 'list'
+type FieldType = 'text' | 'textarea' | 'checkbox' | 'image' | 'list' | 'gallery'
 
 export interface FieldConfig {
   key: string
@@ -117,7 +117,7 @@ export function EntityManager<T extends BaseItem>({
       </div>
 
       {editingId !== null && (
-        <div className="mb-8 flex flex-col gap-4 border border-border bg-surface p-6">
+        <div key={editingId} className="mb-8 flex flex-col gap-4 border border-border bg-surface p-6">
           {fields.map((f) => {
             const value = form[f.key]
             if (f.type === 'text')
@@ -164,6 +164,15 @@ export function EntityManager<T extends BaseItem>({
                   key={f.key}
                   label={f.label}
                   placeholder={f.placeholder}
+                  value={(value as string[]) ?? []}
+                  onChange={(v) => setForm((s) => ({ ...s, [f.key]: v }))}
+                />
+              )
+            if (f.type === 'gallery')
+              return (
+                <GalleryField
+                  key={f.key}
+                  label={f.label}
                   value={(value as string[]) ?? []}
                   onChange={(v) => setForm((s) => ({ ...s, [f.key]: v }))}
                 />

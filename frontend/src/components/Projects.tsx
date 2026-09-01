@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import type { Project } from '../types'
 import { assetUrl } from '../lib/api'
 import { Section, SectionHeading } from './Section'
@@ -18,15 +19,17 @@ export function Projects({ projects }: { projects: Project[] }) {
                 {p.is_featured && <span className="text-fg">Featured</span>}
               </div>
 
-              {p.image_url && (
-                <img
-                  src={assetUrl(p.image_url)}
-                  alt={p.title}
-                  className="mt-4 aspect-video w-full rounded object-cover"
-                />
-              )}
+              <Link to={`/projects/${p.id}`}>
+                {p.image_url && (
+                  <img
+                    src={assetUrl(p.image_url)}
+                    alt={p.title}
+                    className="mt-4 aspect-video w-full rounded object-cover transition-opacity group-hover:opacity-80"
+                  />
+                )}
 
-              <h3 className="mt-5 text-2xl font-semibold text-fg">{p.title}</h3>
+                <h3 className="mt-5 text-2xl font-semibold text-fg group-hover:underline">{p.title}</h3>
+              </Link>
               <p className="mt-2 text-sm leading-relaxed text-muted">{p.description}</p>
             </div>
 
@@ -43,7 +46,10 @@ export function Projects({ projects }: { projects: Project[] }) {
                   ))}
                 </div>
               )}
-              <div className="flex gap-4 font-mono text-xs tracking-widest uppercase">
+              <div className="flex flex-wrap gap-4 font-mono text-xs tracking-widest uppercase">
+                <Link to={`/projects/${p.id}`} className="text-fg hover:text-muted">
+                  자세히 보기 →
+                </Link>
                 {p.github_url && (
                   <a href={p.github_url} target="_blank" rel="noreferrer" className="text-fg hover:text-muted">
                     Github ↗

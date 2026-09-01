@@ -22,6 +22,13 @@ def make_crud_router(
     def list_items(db: Session = Depends(get_db)):
         return db.query(model).order_by(model.order, model.id).all()
 
+    @router.get("/{item_id}", response_model=out_schema)
+    def get_item(item_id: int, db: Session = Depends(get_db)):
+        item = db.query(model).filter(model.id == item_id).first()
+        if not item:
+            raise HTTPException(status_code=404, detail="찾을 수 없습니다.")
+        return item
+
     @router.post("", response_model=out_schema, dependencies=[Depends(get_current_admin)])
     def create_item(payload: create_schema, db: Session = Depends(get_db)):
         item = model(**payload.model_dump())

@@ -110,10 +110,12 @@ class MemberOut(MemberBase):
 class ProjectBase(BaseModel):
     title: str
     description: str = ""
+    content: str = ""
     tags: str = ""
     github_url: str = ""
     live_url: str = ""
     image_url: str = ""
+    gallery: list[str] = []
     is_featured: bool = False
     order: int = 0
 

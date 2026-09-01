@@ -5,6 +5,7 @@ import { AdminLogin } from './admin/AdminLogin'
 import { ProtectedRoute } from './admin/ProtectedRoute'
 import { AuthProvider } from './lib/auth'
 import { Home } from './pages/Home'
+import { ProjectDetail } from './pages/ProjectDetail'
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? ''
 
@@ -14,6 +15,7 @@ function Routed() {
       <AuthProvider>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/projects/:id" element={<ProjectDetail />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route
             path="/admin"
