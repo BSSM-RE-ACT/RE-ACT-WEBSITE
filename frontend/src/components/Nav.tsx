@@ -27,7 +27,7 @@ export function Nav({ clubName }: { clubName: string }) {
       }`}
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 md:px-12 lg:px-20">
-        <a href="#top" className="flex items-center gap-2 font-mono text-sm font-semibold tracking-[0.15em] text-fg">
+        <a href="#top" className="flex items-center gap-2 font-mono text-base font-bold tracking-[0.1em] text-fg">
           <img src="/logo.png" alt="" className="h-6 w-6" />
           {clubName || 'RE:ACT'}
         </a>
