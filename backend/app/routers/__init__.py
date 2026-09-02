@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from .. import models, schemas
 from .factory import make_crud_router
-from . import admin_emails, auth, site_content, uploads, visits
+from . import admin_emails, auth, contact, site_content, uploads, visits
 
 api_router = APIRouter()
 api_router.include_router(auth.router)
@@ -10,6 +10,7 @@ api_router.include_router(site_content.router)
 api_router.include_router(uploads.router)
 api_router.include_router(admin_emails.router)
 api_router.include_router(visits.router)
+api_router.include_router(contact.router)
 
 api_router.include_router(
     make_crud_router(

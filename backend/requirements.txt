@@ -9,3 +9,4 @@ google-auth
 requests
 pymysql
 cryptography
+email-validator

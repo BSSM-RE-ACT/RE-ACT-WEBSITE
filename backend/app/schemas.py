@@ -1,4 +1,12 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
+
+
+# ---------- contact ----------
+class ContactMessageCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=64)
+    email: EmailStr
+    message: str = Field(min_length=1, max_length=2000)
+    website: str = ""  # honeypot; real users never fill this
 
 
 # ---------- auth ----------
