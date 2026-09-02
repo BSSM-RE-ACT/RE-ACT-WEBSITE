@@ -32,7 +32,7 @@ export function ProjectDetail() {
       <Nav clubName={clubName} />
 
       <div className="mx-auto max-w-4xl px-6 py-16 md:px-12 lg:px-20">
-        <Link to="/#projects" className="mb-10 inline-block font-mono text-xs tracking-widest text-muted uppercase hover:text-fg">
+        <Link to="/projects" className="mb-10 inline-block font-mono text-xs tracking-widest text-muted uppercase hover:text-fg">
           ← Projects
         </Link>
 
@@ -41,7 +41,7 @@ export function ProjectDetail() {
         {!loading && notFound && (
           <div>
             <h1 className="text-3xl font-semibold text-fg">프로젝트를 찾을 수 없어요</h1>
-            <Link to="/#projects" className="mt-4 inline-block text-sm text-muted hover:text-fg">
+            <Link to="/projects" className="mt-4 inline-block text-sm text-muted hover:text-fg">
               프로젝트 목록으로 돌아가기 →
             </Link>
           </div>

@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 
 const LINKS = [
-  { href: '#about', label: 'About' },
-  { href: '#projects', label: 'Projects' },
-  { href: '#skills', label: 'Skills' },
-  { href: '#activities', label: 'Activities' },
-  { href: '#members', label: 'Members' },
-  { href: '#recruit', label: 'Recruit' },
-  { href: '#contact', label: 'Contact' },
+  { to: '/#about', label: 'About' },
+  { to: '/projects', label: 'Projects' },
+  { to: '/#skills', label: 'Skills' },
+  { to: '/#activities', label: 'Activities' },
+  { to: '/#members', label: 'Members' },
+  { to: '/#recruit', label: 'Recruit' },
+  { to: '/contact', label: 'Contact' },
 ]
 
 export function Nav({ clubName }: { clubName: string }) {
@@ -27,16 +28,20 @@ export function Nav({ clubName }: { clubName: string }) {
       }`}
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 md:px-12 lg:px-20">
-        <a href="#top" className="flex items-center gap-2 font-mono text-base font-bold tracking-[0.1em] text-fg">
+        <Link to="/" className="flex items-center gap-2 font-mono text-base font-bold tracking-[0.1em] text-fg">
           <img src="/logo.png" alt="" className="h-6 w-6" />
           {clubName || 'RE:ACT'}
-        </a>
+        </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
           {LINKS.map((l) => (
-            <a key={l.href} href={l.href} className="font-mono text-xs tracking-widest text-muted uppercase transition-colors hover:text-fg">
+            <Link
+              key={l.to}
+              to={l.to}
+              className="font-mono text-xs tracking-widest text-muted uppercase transition-colors hover:text-fg"
+            >
               {l.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -51,14 +56,14 @@ export function Nav({ clubName }: { clubName: string }) {
       {open && (
         <nav className="flex flex-col gap-1 border-t border-border px-6 pb-6 md:hidden">
           {LINKS.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
+            <Link
+              key={l.to}
+              to={l.to}
               onClick={() => setOpen(false)}
               className="py-2 font-mono text-xs tracking-widest text-muted uppercase hover:text-fg"
             >
               {l.label}
-            </a>
+            </Link>
           ))}
         </nav>
       )}

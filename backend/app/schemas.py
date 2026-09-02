@@ -119,6 +119,7 @@ class ProjectBase(BaseModel):
     title: str
     description: str = ""
     content: str = ""
+    category: str = ""
     tags: str = ""
     github_url: str = ""
     live_url: str = ""

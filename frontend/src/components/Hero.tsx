@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import type { SiteContent } from '../types'
 import { Marquee } from './Marquee'
 
@@ -24,18 +25,18 @@ export function Hero({ content }: { content: SiteContent }) {
         <p className="animate-fade-up mt-6 max-w-md font-mono text-sm text-muted">{content.tagline}</p>
 
         <div className="mt-10 flex flex-wrap items-center gap-4">
-          <a
-            href="#projects"
+          <Link
+            to="/projects"
             className="inline-flex items-center gap-2 border border-fg bg-fg px-6 py-3 font-mono text-xs tracking-widest text-bg uppercase transition-opacity hover:opacity-80"
           >
             Projects <span aria-hidden>→</span>
-          </a>
-          <a
-            href="#contact"
+          </Link>
+          <Link
+            to="/contact"
             className="inline-flex items-center gap-2 border border-border px-6 py-3 font-mono text-xs tracking-widest text-fg uppercase transition-colors hover:border-fg"
           >
             Contact
-          </a>
+          </Link>
         </div>
       </div>
 

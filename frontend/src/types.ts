@@ -35,6 +35,7 @@ export interface Project {
   title: string
   description: string
   content: string
+  category: string
   tags: string
   github_url: string
   live_url: string

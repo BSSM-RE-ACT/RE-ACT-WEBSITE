@@ -81,6 +81,7 @@ class Project(Base):
     title = Column(String(128), nullable=False)
     description = Column(Text, default="")
     content = Column(Text, default="")
+    category = Column(String(64), default="")
     tags = Column(String(255), default="")
     github_url = Column(String(255), default="")
     live_url = Column(String(255), default="")
