@@ -132,7 +132,7 @@ export function ImageField({
       })
       onChange(res.data.url)
     } catch {
-      setError('업로드에 실패했어요. (이미지 5MB 이하)')
+      setError('업로드에 실패했어요. (이미지 100MB 이하)')
     } finally {
       setUploading(false)
     }
@@ -205,7 +205,7 @@ export function GalleryField({
       })
       onChange([...value, res.data.url])
     } catch {
-      setError('업로드에 실패했어요. (이미지 5MB 이하)')
+      setError('업로드에 실패했어요. (이미지 100MB 이하)')
     } finally {
       setUploading(false)
     }

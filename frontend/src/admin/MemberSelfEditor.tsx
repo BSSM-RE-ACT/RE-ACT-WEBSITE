@@ -97,7 +97,7 @@ export function MemberSelfEditor() {
               onChange={(v) => setForm((s) => ({ ...s, portfolio_url: v }))}
             />
             <TextField
-              label={`개인 페이지 주소 (${form.slug || '슬러그'}.${APEX_HOST})`}
+              label={`개인 페이지 주소 (${form.slug || '슬러그'}-${APEX_HOST})`}
               placeholder="jm"
               value={form.slug}
               onChange={(v) => setForm((s) => ({ ...s, slug: v }))}
