@@ -5,9 +5,9 @@ from sqlalchemy.orm import Session
 
 from ..config import settings
 from ..database import get_db
-from ..models import AdminAllowedEmail, AdminUser
+from ..models import AdminAllowedEmail, AdminUser, Member
 from ..schemas import GoogleLoginRequest, LoginRequest, MeOut, Token
-from ..security import AdminIdentity, create_access_token, get_current_admin, verify_password
+from ..security import AdminIdentity, create_access_token, get_current_identity, verify_password
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -38,13 +38,20 @@ def google_login(payload: GoogleLoginRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="이메일 인증이 확인되지 않았어요.")
 
     allowed = db.query(AdminAllowedEmail).filter(AdminAllowedEmail.email == email).first()
-    if not allowed:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="관리자로 등록되지 않은 구글 계정이에요.")
+    member = db.query(Member).filter(Member.email == email, Member.email != "").first()
+    if not allowed and not member:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="등록되지 않은 구글 계정이에요.")
 
     token = create_access_token(subject=email)
     return Token(access_token=token)
 
 
 @router.get("/me", response_model=MeOut)
-def me(admin: AdminIdentity = Depends(get_current_admin)):
-    return MeOut(subject=admin.subject, is_root=admin.is_root, name=admin.name)
+def me(identity: AdminIdentity = Depends(get_current_identity)):
+    return MeOut(
+        subject=identity.subject,
+        is_root=identity.is_root,
+        is_admin=identity.is_admin,
+        member_id=identity.member_id,
+        name=identity.name,
+    )

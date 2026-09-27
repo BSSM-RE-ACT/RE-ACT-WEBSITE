@@ -21,8 +21,8 @@ export function AdminLogin() {
     setLoading(true)
     setError('')
     try {
-      await login(username, password)
-      navigate('/admin')
+      const me = await login(username, password)
+      navigate(me.is_admin ? '/admin' : '/admin/me')
     } catch {
       setError('아이디 또는 비밀번호가 올바르지 않아요.')
     } finally {
@@ -34,11 +34,11 @@ export function AdminLogin() {
     if (!credential) return
     setError('')
     try {
-      await loginWithGoogle(credential)
-      navigate('/admin')
+      const me = await loginWithGoogle(credential)
+      navigate(me.is_admin ? '/admin' : '/admin/me')
     } catch (err) {
       const status = (err as { response?: { status?: number } })?.response?.status
-      if (status === 403) setError('관리자로 등록되지 않은 구글 계정이에요. root 계정에 문의해 주세요.')
+      if (status === 403) setError('등록되지 않은 구글 계정이에요. root 계정에 문의해 주세요.')
       else setError('구글 로그인에 실패했어요.')
     }
   }

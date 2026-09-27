@@ -27,7 +27,11 @@ export interface Member {
   bio: string
   image_url: string
   github_url: string
+  portfolio_url: string
+  slug: string
   order: number
+  /** only present when fetched via the admin-only /members/admin endpoint */
+  email?: string
 }
 
 export interface Project {
@@ -85,5 +89,7 @@ export interface VisitStats {
 export interface Me {
   subject: string
   is_root: boolean
+  is_admin: boolean
+  member_id: number | null
   name: string
 }

@@ -27,6 +27,8 @@ class Token(BaseModel):
 class MeOut(BaseModel):
     subject: str
     is_root: bool
+    is_admin: bool = False
+    member_id: int | None = None
     name: str = ""
 
 
@@ -102,16 +104,32 @@ class MemberBase(BaseModel):
     bio: str = ""
     image_url: str = ""
     github_url: str = ""
+    portfolio_url: str = ""
+    slug: str = ""
     order: int = 0
 
 
 class MemberCreate(MemberBase):
-    pass
+    email: str = ""  # admin-only: links this member to their own Google login
 
 
 class MemberOut(MemberBase):
     model_config = ConfigDict(from_attributes=True)
     id: int
+
+
+class MemberAdminOut(MemberOut):
+    """Same as MemberOut but includes email — admin dashboard only, never public."""
+
+    email: str = ""
+
+
+class MemberSelfUpdate(BaseModel):
+    bio: str = ""
+    image_url: str = ""
+    github_url: str = ""
+    portfolio_url: str = ""
+    slug: str = ""
 
 
 # ---------- projects ----------

@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from .. import models, schemas
 from .factory import make_crud_router
-from . import admin_emails, auth, contact, site_content, uploads, visits
+from . import admin_emails, auth, contact, member_self, site_content, uploads, visits
 
 api_router = APIRouter()
 api_router.include_router(auth.router)
@@ -11,6 +11,10 @@ api_router.include_router(uploads.router)
 api_router.include_router(admin_emails.router)
 api_router.include_router(visits.router)
 api_router.include_router(contact.router)
+
+# must be registered before the generic /members/{item_id} route below, so
+# "/members/me" and "/members/admin" aren't swallowed as item_id="me"/"admin"
+api_router.include_router(member_self.router)
 
 api_router.include_router(
     make_crud_router(

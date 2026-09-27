@@ -19,12 +19,15 @@ interface BaseItem {
 export function EntityManager<T extends BaseItem>({
   title,
   endpoint,
+  readEndpoint,
   fields,
   emptyItem,
   renderLabel,
 }: {
   title: string
   endpoint: string
+  /** Override where the list is fetched from (e.g. an admin-only endpoint with extra fields). Writes still go to `endpoint`. */
+  readEndpoint?: string
   fields: FieldConfig[]
   emptyItem: Omit<T, 'id' | 'order'>
   renderLabel: (item: T) => string
@@ -38,7 +41,7 @@ export function EntityManager<T extends BaseItem>({
 
   async function load() {
     setLoading(true)
-    const res = await api.get<T[]>(endpoint)
+    const res = await api.get<T[]>(readEndpoint ?? endpoint)
     setItems(res.data)
     setLoading(false)
   }
@@ -46,7 +49,7 @@ export function EntityManager<T extends BaseItem>({
   useEffect(() => {
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [endpoint])
+  }, [endpoint, readEndpoint])
 
   function startCreate() {
     setForm({ ...emptyItem, order: items.length })

@@ -8,15 +8,24 @@ from sqlalchemy.orm import Session
 
 from .config import settings
 from .database import get_db
-from .models import AdminAllowedEmail, AdminUser
+from .models import AdminAllowedEmail, AdminUser, Member
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
 
 
 class AdminIdentity:
-    def __init__(self, subject: str, is_root: bool, name: str = ""):
+    def __init__(
+        self,
+        subject: str,
+        is_root: bool = False,
+        is_admin: bool = False,
+        member_id: int | None = None,
+        name: str = "",
+    ):
         self.subject = subject
         self.is_root = is_root
+        self.is_admin = is_admin  # root, or a Google account on the admin allowlist
+        self.member_id = member_id  # set for a member's own self-service account
         self.name = name
 
 
@@ -34,7 +43,7 @@ def create_access_token(subject: str) -> str:
     return jwt.encode(payload, settings.secret_key, algorithm=settings.algorithm)
 
 
-def get_current_admin(
+def get_current_identity(
     token: str | None = Depends(oauth2_scheme),
     db: Session = Depends(get_db),
 ) -> AdminIdentity:
@@ -55,16 +64,32 @@ def get_current_admin(
 
     root = db.query(AdminUser).filter(AdminUser.username == subject).first()
     if root:
-        return AdminIdentity(subject=subject, is_root=True, name=root.username)
+        return AdminIdentity(subject=subject, is_root=True, is_admin=True, name=root.username)
 
     allowed = db.query(AdminAllowedEmail).filter(AdminAllowedEmail.email == subject).first()
     if allowed:
-        return AdminIdentity(subject=subject, is_root=False, name=allowed.name or allowed.email)
+        return AdminIdentity(subject=subject, is_admin=True, name=allowed.name or allowed.email)
+
+    member = db.query(Member).filter(Member.email == subject, Member.email != "").first()
+    if member:
+        return AdminIdentity(subject=subject, member_id=member.id, name=member.name)
 
     raise unauthorized
+
+
+def get_current_admin(identity: AdminIdentity = Depends(get_current_identity)) -> AdminIdentity:
+    if not identity.is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="관리자만 할 수 있어요.")
+    return identity
 
 
 def get_current_root(admin: AdminIdentity = Depends(get_current_admin)) -> AdminIdentity:
     if not admin.is_root:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="root 계정만 할 수 있어요.")
     return admin
+
+
+def get_current_member(identity: AdminIdentity = Depends(get_current_identity)) -> AdminIdentity:
+    if identity.member_id is None:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="부원 계정으로만 할 수 있어요.")
+    return identity

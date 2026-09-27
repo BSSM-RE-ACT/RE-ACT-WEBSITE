@@ -6,8 +6,10 @@ interface AuthContextValue {
   token: string | null
   me: Me | null
   isRoot: boolean
-  login: (username: string, password: string) => Promise<void>
-  loginWithGoogle: (credential: string) => Promise<void>
+  isAdmin: boolean
+  memberId: number | null
+  login: (username: string, password: string) => Promise<Me>
+  loginWithGoogle: (credential: string) => Promise<Me>
   logout: () => void
 }
 
@@ -21,8 +23,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const res = await api.get<Me>('/auth/me')
       setMe(res.data)
+      return res.data
     } catch {
       setMe(null)
+      return null
     }
   }
 
@@ -36,12 +40,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const res = await api.post('/auth/login', { username, password })
     localStorage.setItem(TOKEN_KEY, res.data.access_token)
     setToken(res.data.access_token)
+    const fetched = await refreshMe()
+    if (!fetched) throw new Error('로그인 정보를 불러오지 못했어요.')
+    return fetched
   }
 
   async function loginWithGoogle(credential: string) {
     const res = await api.post('/auth/google', { credential })
     localStorage.setItem(TOKEN_KEY, res.data.access_token)
     setToken(res.data.access_token)
+    const fetched = await refreshMe()
+    if (!fetched) throw new Error('로그인 정보를 불러오지 못했어요.')
+    return fetched
   }
 
   function logout() {
@@ -51,7 +61,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ token, me, isRoot: me?.is_root ?? false, login, loginWithGoogle, logout }}>
+    <AuthContext.Provider
+      value={{
+        token,
+        me,
+        isRoot: me?.is_root ?? false,
+        isAdmin: me?.is_admin ?? false,
+        memberId: me?.member_id ?? null,
+        login,
+        loginWithGoogle,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   )

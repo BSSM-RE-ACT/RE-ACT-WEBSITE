@@ -70,6 +70,44 @@ Cloudflare가 알아서 처리합니다. (bssm.dev 도메인이 이미 Cloudflar
 > `docker-compose.yml`의 `cloudflared` 서비스는 지우거나 `CLOUDFLARE_TUNNEL_TOKEN`을 빈 채로 두면
 > (재시작을 반복하긴 하지만) 다른 서비스에는 영향 없어요.
 
+### 부원 개인 페이지 (`이니셜.react.bssm.dev`)
+
+관리자 → 부원 탭에서 부원마다 "개인 페이지 주소"(슬러그, 예: `jm`)를 넣으면 `jm.react.bssm.dev`에서
+그 부원의 사진/소개/기수/역할/Github·포트폴리오 링크만 보여주는 개인 페이지가 열려요. 프론트엔드
+하나가 호스트명을 보고 알아서 분기하는 거라, 서버 코드나 라우팅을 새로 안 만들어도 부원을 몇 명 추가하든
+그대로 동작해요.
+
+이걸 켜려면 Cloudflare Tunnel Public Hostname에 **와일드카드를 하나만 추가**하면 돼요:
+
+1. 위에서 만든 터널의 **Public Hostname** 탭 → Add a public hostname
+   - Subdomain: `*`, Domain: `react.bssm.dev`처럼 이미 있는 `react.bssm.dev`를 도메인으로 잡고
+     서브도메인에 `*`를 입력 (합쳐서 `*.react.bssm.dev`)
+   - Service Type: **HTTP**, URL: **`frontend:80`** (위 `react.bssm.dev` 항목과 동일하게)
+2. 저장하면 Cloudflare가 와일드카드 DNS 레코드를 자동으로 만들어줘요 (bssm.dev 존이 이미
+   Cloudflare에 있으니까 별도 DNS 설정 없이 바로 됨)
+3. 관리자 페이지에서 부원 슬러그를 채우면 몇 초 안에 `<슬러그>.react.bssm.dev`가 열려요
+
+등록 안 된 슬러그로 들어오면 "등록된 부원 페이지 주소가 아니에요"라는 안내와 함께
+`react.bssm.dev`로 돌아가는 링크가 나와요. 실제 도메인이 `react.bssm.dev`가 아니면 프론트엔드
+빌드 시 `VITE_APEX_HOST` 환경변수로 바꿀 수 있어요 (`docker-compose.yml`의 frontend build args에
+추가).
+
+#### 부원이 자기 페이지를 직접 수정하게 하기
+
+root가 매번 대신 수정해줄 필요 없이, 부원 본인이 구글 로그인으로 들어와서 자기 소개/사진/링크/슬러그를
+직접 바꿀 수 있어요.
+
+1. 관리자 → 부원 탭에서 그 부원 항목을 편집 → **"구글 이메일 (본인이 로그인해서 직접 수정하게
+   하려면)"** 필드에 그 부원의 구글 이메일을 넣고 저장
+2. 그 부원이 `react.bssm.dev/admin/login`에서 자기 구글 계정으로 로그인하면, 전체 관리자 페이지가
+   아니라 **자기 정보만 수정할 수 있는 `/admin/me` 페이지**로 자동 연결돼요
+3. 거기서 소개/사진/Github·포트폴리오 링크/슬러그만 바꿀 수 있고, 이름·역할·기수·순서는 root만
+   바꿀 수 있어요 (동아리장 자칭 방지)
+
+이 이메일은 "관리자 계정" 탭의 구글 로그인 허용 목록과는 별개예요 — 부원 이메일은 자기 정보만,
+관리자 허용 목록 이메일은 사이트 전체를 수정할 수 있어요. 같은 사람이 둘 다에 등록되어 있으면
+관리자 권한이 우선합니다.
+
 ## 로컬 개발 (Docker 없이)
 
 ### 백엔드

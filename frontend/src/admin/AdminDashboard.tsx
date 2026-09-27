@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Navigate } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
 import type { ActivityEvent, GoalItem, Member, Project, SkillCategory } from '../types'
 import { AdminEmails } from './AdminEmails'
@@ -19,8 +20,10 @@ const TABS = [
 type TabKey = (typeof TABS)[number]['key']
 
 export function AdminDashboard() {
-  const { logout, me } = useAuth()
+  const { logout, me, isAdmin, memberId } = useAuth()
   const [tab, setTab] = useState<TabKey>('content')
+
+  if (me && !isAdmin && memberId) return <Navigate to="/admin/me" replace />
 
   return (
     <div className="min-h-screen bg-bg text-fg">
@@ -62,8 +65,19 @@ export function AdminDashboard() {
             <EntityManager<Member>
               title="부원"
               endpoint="/members"
-              emptyItem={{ name: '', role: '부원', generation: '', bio: '', image_url: '', github_url: '' }}
-              renderLabel={(m) => `${m.name} · ${m.role}`}
+              readEndpoint="/members/admin"
+              emptyItem={{
+                name: '',
+                role: '부원',
+                generation: '',
+                bio: '',
+                image_url: '',
+                github_url: '',
+                portfolio_url: '',
+                slug: '',
+                email: '',
+              }}
+              renderLabel={(m) => `${m.name} · ${m.role}${m.slug ? ` · ${m.slug}.react.bssm.dev` : ''}${m.email ? ` · ${m.email}` : ''}`}
               fields={[
                 { key: 'name', label: '이름', type: 'text' },
                 { key: 'role', label: '역할', type: 'text', placeholder: '동아리장 / 부원' },
@@ -71,6 +85,19 @@ export function AdminDashboard() {
                 { key: 'bio', label: '소개', type: 'textarea' },
                 { key: 'image_url', label: '사진', type: 'image' },
                 { key: 'github_url', label: 'Github 링크', type: 'text' },
+                { key: 'portfolio_url', label: '개인 포트폴리오 링크 (외부)', type: 'text', placeholder: 'https://example.com' },
+                {
+                  key: 'slug',
+                  label: '개인 페이지 주소 (예: jm → jm.react.bssm.dev)',
+                  type: 'text',
+                  placeholder: 'jm',
+                },
+                {
+                  key: 'email',
+                  label: '구글 이메일 (본인이 로그인해서 직접 수정하게 하려면)',
+                  type: 'text',
+                  placeholder: 'member@gmail.com',
+                },
               ]}
             />
           )}

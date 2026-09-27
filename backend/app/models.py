@@ -71,6 +71,9 @@ class Member(Base):
     bio = Column(Text, default="")
     image_url = Column(String(255), default="")
     github_url = Column(String(255), default="")
+    portfolio_url = Column(String(255), default="")
+    slug = Column(String(64), default="")  # <slug>.react.bssm.dev personal page
+    email = Column(String(255), default="")  # google account allowed to self-edit this member
     order = Column(Integer, default=0)
 
 

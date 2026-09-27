@@ -24,16 +24,28 @@ export function Members({ members }: { members: Member[] }) {
               </p>
             </div>
             {m.bio && <p className="text-xs text-muted">{m.bio}</p>}
-            {m.github_url && (
-              <a
-                href={m.github_url}
-                target="_blank"
-                rel="noreferrer"
-                className="font-mono text-[11px] tracking-widest text-fg uppercase hover:text-muted"
-              >
-                Github ↗
-              </a>
-            )}
+            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+              {m.github_url && (
+                <a
+                  href={m.github_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-mono text-[11px] tracking-widest text-fg uppercase hover:text-muted"
+                >
+                  Github ↗
+                </a>
+              )}
+              {m.portfolio_url && (
+                <a
+                  href={m.portfolio_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-mono text-[11px] tracking-widest text-fg uppercase hover:text-muted"
+                >
+                  Portfolio ↗
+                </a>
+              )}
+            </div>
           </div>
         ))}
       </div>

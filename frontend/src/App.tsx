@@ -2,10 +2,13 @@ import { GoogleOAuthProvider } from '@react-oauth/google'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AdminDashboard } from './admin/AdminDashboard'
 import { AdminLogin } from './admin/AdminLogin'
+import { MemberSelfEditor } from './admin/MemberSelfEditor'
 import { ProtectedRoute } from './admin/ProtectedRoute'
 import { AuthProvider } from './lib/auth'
+import { getMemberSlug } from './lib/subdomain'
 import { ContactPage } from './pages/ContactPage'
 import { Home } from './pages/Home'
+import { MemberPortfolio } from './pages/MemberPortfolio'
 import { ProjectDetail } from './pages/ProjectDetail'
 import { ProjectsPage } from './pages/ProjectsPage'
 
@@ -22,6 +25,14 @@ function Routed() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route
+            path="/admin/me"
+            element={
+              <ProtectedRoute>
+                <MemberSelfEditor />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/admin"
             element={
               <ProtectedRoute>
@@ -36,6 +47,9 @@ function Routed() {
 }
 
 function App() {
+  const memberSlug = getMemberSlug()
+  if (memberSlug) return <MemberPortfolio slug={memberSlug} />
+
   if (!GOOGLE_CLIENT_ID) return <Routed />
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
