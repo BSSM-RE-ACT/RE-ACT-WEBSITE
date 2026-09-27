@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
+import { Footer } from '../components/Footer'
+import { Nav } from '../components/Nav'
 import { assetUrl } from '../lib/api'
 import { useApiData } from '../lib/useApiData'
 import type { Member, SiteContent } from '../types'
 
-const APEX_HOST = import.meta.env.VITE_APEX_HOST || 'react.bssm.dev'
+const DEFAULT_CONTENT: Partial<SiteContent> = { club_name: 'RE:ACT' }
 
-export function MemberPortfolio({ slug }: { slug: string }) {
-  const { data: content } = useApiData<SiteContent>('/site-content', { club_name: 'RE:ACT' } as SiteContent)
+export function MemberPortfolio() {
+  const { slug = '' } = useParams()
+  const { data: content } = useApiData<SiteContent>('/site-content', DEFAULT_CONTENT as SiteContent)
   const { data: members, loading } = useApiData<Member[]>('/members', [])
   const [member, setMember] = useState<Member | null>(null)
   const [notFound, setNotFound] = useState(false)
@@ -16,21 +20,14 @@ export function MemberPortfolio({ slug }: { slug: string }) {
     const found = members.find((m) => m.slug.toLowerCase() === slug.toLowerCase())
     if (found) setMember(found)
     else setNotFound(true)
+    window.scrollTo(0, 0)
   }, [loading, members, slug])
 
   return (
     <div className="min-h-screen bg-bg text-fg">
-      <header className="mx-auto flex max-w-3xl items-center justify-between px-6 py-8">
-        <a
-          href={`https://${APEX_HOST}`}
-          className="flex items-center gap-2 font-mono text-xs tracking-widest text-muted uppercase hover:text-fg"
-        >
-          <img src="/logo.png" alt="" className="h-5 w-5" />
-          {content.club_name || 'RE:ACT'}
-        </a>
-      </header>
+      <Nav clubName={content.club_name} />
 
-      <div className="mx-auto max-w-3xl px-6 py-12">
+      <div className="mx-auto max-w-3xl px-6 py-16 md:px-12 lg:px-20">
         {loading && <p className="text-sm text-muted">불러오는 중…</p>}
 
         {!loading && notFound && (
@@ -39,12 +36,12 @@ export function MemberPortfolio({ slug }: { slug: string }) {
             <p className="mt-3 text-muted">
               <span className="font-mono">{slug}</span>는 등록된 부원 페이지 주소가 아니에요.
             </p>
-            <a
-              href={`https://${APEX_HOST}`}
+            <Link
+              to="/#members"
               className="mt-6 inline-block font-mono text-xs tracking-widest text-fg uppercase hover:text-muted"
             >
-              ← {APEX_HOST}로 가기
-            </a>
+              ← 부원 목록으로
+            </Link>
           </div>
         )}
 
@@ -92,9 +89,7 @@ export function MemberPortfolio({ slug }: { slug: string }) {
         )}
       </div>
 
-      <footer className="mx-auto max-w-3xl px-6 py-10 text-center font-mono text-xs tracking-widest text-muted uppercase">
-        {content.club_name || 'RE:ACT'} 부원 페이지
-      </footer>
+      <Footer clubName={content.club_name} />
     </div>
   )
 }

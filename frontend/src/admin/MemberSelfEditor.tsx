@@ -5,8 +5,6 @@ import { useAuth } from '../lib/auth'
 import type { Member } from '../types'
 import { ImageField, TextAreaField, TextField } from './fields'
 
-const APEX_HOST = import.meta.env.VITE_APEX_HOST || 'react.bssm.dev'
-
 export function MemberSelfEditor() {
   const { logout, memberId, isAdmin } = useAuth()
   const [member, setMember] = useState<Member | null>(null)
@@ -97,7 +95,7 @@ export function MemberSelfEditor() {
               onChange={(v) => setForm((s) => ({ ...s, portfolio_url: v }))}
             />
             <TextField
-              label={`개인 페이지 주소 (${form.slug || '슬러그'}-${APEX_HOST})`}
+              label={`개인 페이지 주소 (/member/${form.slug || '슬러그'})`}
               placeholder="jm"
               value={form.slug}
               onChange={(v) => setForm((s) => ({ ...s, slug: v }))}

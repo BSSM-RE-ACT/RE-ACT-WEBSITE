@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import type { Member } from '../types'
 import { assetUrl } from '../lib/api'
 import { Section, SectionHeading } from './Section'
@@ -18,7 +19,13 @@ export function Members({ members }: { members: Member[] }) {
               )}
             </div>
             <div>
-              <p className="font-medium text-fg">{m.name}</p>
+              {m.slug ? (
+                <Link to={`/member/${m.slug}`} className="font-medium text-fg hover:underline">
+                  {m.name}
+                </Link>
+              ) : (
+                <p className="font-medium text-fg">{m.name}</p>
+              )}
               <p className="font-mono text-xs tracking-widest text-muted uppercase">
                 {[m.role, m.generation].filter(Boolean).join(' · ')}
               </p>

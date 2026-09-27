@@ -77,7 +77,7 @@ export function AdminDashboard() {
                 slug: '',
                 email: '',
               }}
-              renderLabel={(m) => `${m.name} · ${m.role}${m.slug ? ` · ${m.slug}-react.bssm.dev` : ''}${m.email ? ` · ${m.email}` : ''}`}
+              renderLabel={(m) => `${m.name} · ${m.role}${m.slug ? ` · /member/${m.slug}` : ''}${m.email ? ` · ${m.email}` : ''}`}
               fields={[
                 { key: 'name', label: '이름', type: 'text' },
                 { key: 'role', label: '역할', type: 'text', placeholder: '동아리장 / 부원' },
@@ -88,7 +88,7 @@ export function AdminDashboard() {
                 { key: 'portfolio_url', label: '개인 포트폴리오 링크 (외부)', type: 'text', placeholder: 'https://example.com' },
                 {
                   key: 'slug',
-                  label: '개인 페이지 주소 (예: jm → jm-react.bssm.dev)',
+                  label: '개인 페이지 주소 (예: jm → /member/jm)',
                   type: 'text',
                   placeholder: 'jm',
                 },

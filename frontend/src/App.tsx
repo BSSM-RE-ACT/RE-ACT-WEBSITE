@@ -5,7 +5,6 @@ import { AdminLogin } from './admin/AdminLogin'
 import { MemberSelfEditor } from './admin/MemberSelfEditor'
 import { ProtectedRoute } from './admin/ProtectedRoute'
 import { AuthProvider } from './lib/auth'
-import { getMemberSlug } from './lib/subdomain'
 import { ContactPage } from './pages/ContactPage'
 import { Home } from './pages/Home'
 import { MemberPortfolio } from './pages/MemberPortfolio'
@@ -23,6 +22,7 @@ function Routed() {
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/projects/:id" element={<ProjectDetail />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/member/:slug" element={<MemberPortfolio />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route
             path="/admin/me"
@@ -47,9 +47,6 @@ function Routed() {
 }
 
 function App() {
-  const memberSlug = getMemberSlug()
-  if (memberSlug) return <MemberPortfolio slug={memberSlug} />
-
   if (!GOOGLE_CLIENT_ID) return <Routed />
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>

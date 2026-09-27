@@ -70,36 +70,18 @@ Cloudflare가 알아서 처리합니다. (bssm.dev 도메인이 이미 Cloudflar
 > `docker-compose.yml`의 `cloudflared` 서비스는 지우거나 `CLOUDFLARE_TUNNEL_TOKEN`을 빈 채로 두면
 > (재시작을 반복하긴 하지만) 다른 서비스에는 영향 없어요.
 
-### 부원 개인 페이지 (`이니셜-react.bssm.dev`)
+### 부원 개인 페이지 (`react.bssm.dev/member/이니셜`)
 
-관리자 → 부원 탭에서 부원마다 "개인 페이지 주소"(슬러그, 예: `jm`)를 넣으면 `jm-react.bssm.dev`에서
-그 부원의 사진/소개/기수/역할/Github·포트폴리오 링크만 보여주는 개인 페이지가 열려요. 프론트엔드
-하나가 호스트명을 보고 알아서 분기하는 거라, 서버 코드나 라우팅을 새로 안 만들어도 부원을 몇 명 추가하든
-그대로 동작해요.
+관리자 → 부원 탭에서 부원마다 "개인 페이지 주소"(슬러그, 예: `jm`)를 넣으면 `/member/jm`에서
+그 부원의 사진/소개/기수/역할/Github·포트폴리오 링크만 보여주는 개인 페이지가 열려요. 기존
+사이트 안의 그냥 페이지 하나라서, Cloudflare나 DNS는 전혀 건드릴 필요 없이 부원을 몇 명
+추가하든 바로 동작해요.
 
-⚠️ **점(`.`)이 아니라 하이픈(`-`)이에요** — `jm.react.bssm.dev`처럼 점으로 이어서 두 단계 서브도메인을
-만들면 안 돼요. Cloudflare의 무료 인증서(Universal SSL)는 루트 도메인(`bssm.dev`) 바로 밑
-**한 단계까지만** 커버해서 (`*.bssm.dev`는 되지만 `*.react.bssm.dev`는 안 됨), 두 단계로 만들면
-"unsupported protocol" 같은 SSL 에러가 나요. `jm-react.bssm.dev`처럼 하이픈으로 붙이면 `bssm.dev`
-바로 밑 한 단계라 무료 인증서로 커버돼요.
+(처음엔 `이니셜.react.bssm.dev` 서브도메인 방식으로 만들었었는데, Cloudflare 무료 인증서가
+`bssm.dev` 바로 밑 한 단계까지만 커버해서 — `react.bssm.dev`는 되지만 그 밑에 또 서브도메인을
+붙이는 건 안 됨 — 매번 도메인/인증서 문제가 나서 이 경로 방식으로 바꿨어요.)
 
-켜는 방법 (부원마다 한 번씩, `react.bssm.dev`를 처음 연결했을 때랑 똑같은 방식):
-
-1. 터널의 **Public Hostname**(또는 최신 대시보드 기준 "Published applications") 탭 →
-   **Add a public hostname**
-2. Domain 드롭다운에서 `bssm.dev` 선택, Subdomain 칸에 `jm-react`처럼 `<슬러그>-react` 입력
-3. Service Type: **HTTP**, URL: **`frontend:80`**
-4. 저장
-
-`react.bssm.dev`를 처음 연결했을 때처럼, 이렇게 추가하면 DNS 레코드도 인증서도 Cloudflare가 알아서
-만들어줘요 — 따로 DNS 탭에 가서 CNAME을 수동으로 추가할 필요 없어요 (수동으로 추가해야 했던 건
-두 단계 서브도메인 방식이었을 때 얘기예요). 관리자 페이지에서 그 부원 슬러그를 채우면 몇 초 안에
-`<슬러그>-react.bssm.dev`가 열려요.
-
-등록 안 된 슬러그로 들어오면 "등록된 부원 페이지 주소가 아니에요"라는 안내와 함께
-`react.bssm.dev`로 돌아가는 링크가 나와요. 실제 도메인이 `react.bssm.dev`가 아니면 프론트엔드
-빌드 시 `VITE_APEX_HOST` 환경변수로 바꿀 수 있어요 (`docker-compose.yml`의 frontend build args에
-추가).
+등록 안 된 슬러그로 들어오면 "등록된 부원 페이지 주소가 아니에요"라는 안내가 나와요.
 
 #### 부원이 자기 페이지를 직접 수정하게 하기
 
